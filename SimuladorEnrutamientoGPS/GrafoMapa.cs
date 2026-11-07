@@ -28,7 +28,7 @@ namespace SimuladorEnrutamientoGPS
             }
         }
 
-        // --- MÉTODO PRINCIPAL: GENERADOR DE LABERINTO (DFS) ---
+        //  MÉTODO PRINCIPAL: GENERADOR DE LABERINTO (DFS) ---
         public void GenerarLaberintoDFS()
         {
             // 1. ESTRUCTURA APLICADA: PILA (Stack - LIFO) para el Backtracking
