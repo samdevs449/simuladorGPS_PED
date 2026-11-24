@@ -1,5 +1,5 @@
 using System;
-using System.Collections.Generic; // Importante: Nos permite usar las Pilas (Stack) y Listas
+using System.Collections.Generic; // I Nos permite usar las Pilas (Stack) y Listas
 using System.Text;
 
 namespace SimuladorEnrutamientoGPS

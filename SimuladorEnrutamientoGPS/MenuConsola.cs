@@ -3,7 +3,7 @@ using System;
 namespace SimuladorEnrutamientoGPS
 {
     // Menú principal interactivo por consola.
-    // Gestiona el flujo paso a paso: pide dimensiones, genera el mapa, solicita puntos al usuario,
+    // Gestiona el flujo paso a paso: pide dimensiones, genera el mapa, solicita puntos al usuario
     // ejecuta la búsqueda en anchura (BFS) y muestra el resultado gráfico y la secuencia de pasos.
     public static class MenuConsola
     {
