@@ -79,6 +79,43 @@ Ejecutar("TC-05", "Integridad de la ruta", () =>
     }
     return (true, $"Ruta válida: {ruta.Count} nodos y {ruta.Count - 1} movimientos.");
 });
+Ejecutar("TC-06", "Validación de dimensiones inválidas en GrafoMapa (QA-02)", () =>
+{
+    bool falloPequeno = false;
+    bool falloPar = false;
+
+    try { _ = new GrafoMapa(3, 3); } catch (ArgumentException) { falloPequeno = true; }
+    try { _ = new GrafoMapa(6, 6); } catch (ArgumentException) { falloPar = true; }
+
+    bool paso = falloPequeno && falloPar;
+    return (paso, $"Rechazó 3x3={falloPequeno}, Rechazó 6x6={falloPar}.");
+});
+
+Ejecutar("TC-07", "Generación reproducible mediante semilla (QA-03)", () =>
+{
+    var mapaA = new GrafoMapa(9, 9, semilla: 42);
+    mapaA.GenerarLaberintoDFS();
+
+    var mapaB = new GrafoMapa(9, 9, semilla: 42);
+    mapaB.GenerarLaberintoDFS();
+
+    bool identicos = mapaA.ObtenerMapaTexto() == mapaB.ObtenerMapaTexto();
+    return (identicos, $"Mapas con semilla 42 idénticos={identicos}.");
+});
+
+Ejecutar("TC-08", "Conectividad garantizada en laberinto DFS generado", () =>
+{
+    var mapa = new GrafoMapa(11, 11, semilla: 100);
+    mapa.GenerarLaberintoDFS();
+
+    var inicio = mapa.MatrizNodos[1, 1];
+    var meta = mapa.MatrizNodos[9, 9];
+    var solver = new SolucionadorRutas();
+
+    bool ok = solver.BuscarRutaBFS(mapa, inicio, meta);
+    bool paso = ok && solver.RutaEncontrada is { Count: > 1 };
+    return (paso, $"Ruta encontrada en laberinto 11x11={ok}, pasos={solver.RutaEncontrada?.Count ?? 0}.");
+});
 
 Console.WriteLine();
 Console.WriteLine("========== RESULTADOS DE QA ==========");

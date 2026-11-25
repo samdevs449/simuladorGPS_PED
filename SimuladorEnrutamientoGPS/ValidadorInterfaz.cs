@@ -91,6 +91,8 @@ namespace SimuladorEnrutamientoGPS
         }
 
         // Valida que ambos nodos existan y no sean obstáculos antes de lanzar el algoritmo de búsqueda
+        // Valida que ambos nodos existan, no sean obstáculos y sean coordenadas distintas (Regla de Negocio #4)
+        // Valida que ambos nodos existan, no sean obstáculos y sean coordenadas distintas (Regla de Negocio #4)
         public static bool ValidarParInicioDestino(Nodo? inicio, Nodo? destino, out string mensajeError)
         {
             if (inicio == null || destino == null)
@@ -102,6 +104,12 @@ namespace SimuladorEnrutamientoGPS
             if (inicio.EsPared || destino.EsPared)
             {
                 mensajeError = "El punto inicial y el punto de llegada deben ser casillas transitables (no pueden ser pared).";
+                return false;
+            }
+
+            if (ReferenceEquals(inicio, destino) || (inicio.X == destino.X && inicio.Y == destino.Y))
+            {
+                mensajeError = $"El punto de origen y el destino no pueden ser la misma coordenada ({inicio.X}, {inicio.Y}). Elija un destino distinto.";
                 return false;
             }
 

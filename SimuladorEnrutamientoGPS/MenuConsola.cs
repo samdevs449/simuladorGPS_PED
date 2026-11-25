@@ -36,10 +36,11 @@ namespace SimuladorEnrutamientoGPS
                 switch (opcion?.Trim())
                 {
                     case "1":
-                        // Reiniciar puntos si se genera un mapa nuevo
+                        // Reiniciar puntos y ruta previa si se genera un mapa nuevo
                         mapaActual = SolicitarDimensionesYGenerar();
                         inicio = null;
                         meta = null;
+                        solver = new SolucionadorRutas();
                         break;
 
                     case "2":
@@ -50,6 +51,7 @@ namespace SimuladorEnrutamientoGPS
                         else
                         {
                             ConfigurarPuntos(mapaActual, ref inicio, ref meta);
+                            solver = new SolucionadorRutas();
                         }
                         break;
 
@@ -152,7 +154,7 @@ namespace SimuladorEnrutamientoGPS
                 MostrarAviso(err);
             }
 
-            // Captura segura de la coordenada de meta
+            // Captura segura de la coordenada de meta (debe ser distinta al inicio según Regla de Negocio #4)
             while (true)
             {
                 Console.WriteLine("\n--- Punto de Destino (M) ---");
@@ -163,6 +165,12 @@ namespace SimuladorEnrutamientoGPS
 
                 if (ValidadorInterfaz.ValidarPuntoTransitable(mapa, x, y, out Nodo? nodoValido, out string err))
                 {
+                    if (!ValidadorInterfaz.ValidarParInicioDestino(inicio, nodoValido, out string errPar))
+                    {
+                        MostrarAviso(errPar);
+                        continue;
+                    }
+
                     meta = nodoValido;
                     Console.ForegroundColor = ConsoleColor.Green;
                     Console.WriteLine($"Punto de llegada fijado en ({meta!.X}, {meta.Y}).");
@@ -171,10 +179,8 @@ namespace SimuladorEnrutamientoGPS
                 }
                 MostrarAviso(err);
             }
-
-            Console.WriteLine("\n--- VISTA CON PUNTOS ASIGNADOS ---");
-            mapa.MostrarMapa(inicio, meta);
         }
+
 
         // Ejecuta el algoritmo BFS y muestra el camino trazado junto a las coordenadas
         private static void CalcularYMostrarRuta(GrafoMapa mapa, Nodo inicio, Nodo meta, SolucionadorRutas solver)

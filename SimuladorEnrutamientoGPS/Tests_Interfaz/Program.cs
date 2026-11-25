@@ -133,6 +133,23 @@ Ejecutar("TC-INT-05", "Flujo completo de simulación (Dimensiones -> DFS -> Punt
 
     return (paso, $"Generación={dimOk}, SelecciónPuntos={puntosOk}, SoluciónBFS={rutaOk} ({solver.RutaEncontrada?.Count ?? 0} pasos), Dibujado={visualOk}");
 });
+// Prueba 6: Cumplimiento de Regla de Negocio #4 (Origen y Destino distintos)
+Ejecutar("TC-INT-06", "Rechazo de coordenadas idénticas para Origen y Destino", () =>
+{
+    var mapa = new GrafoMapa(7, 7);
+    mapa.MatrizNodos[1, 1].EsPared = false;
+    mapa.MatrizNodos[1, 3].EsPared = false;
+
+    var nodoA = mapa.MatrizNodos[1, 1];
+    var nodoB = mapa.MatrizNodos[1, 3];
+
+    bool mismoNodoRechazado = !ValidadorInterfaz.ValidarParInicioDestino(nodoA, nodoA, out string errMismo) &&
+                              errMismo.ToLower().Contains("misma coordenada");
+    bool distintosAceptados = ValidadorInterfaz.ValidarParInicioDestino(nodoA, nodoB, out _);
+
+    bool paso = mismoNodoRechazado && distintosAceptados;
+    return (paso, $"MismoNodoRechazado={mismoNodoRechazado}, DistintosAceptados={distintosAceptados}");
+});
 
 // Imprimir reporte de resultados
 Console.WriteLine();
