@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SimuladorEnrutamientoGPS
@@ -10,19 +9,10 @@ namespace SimuladorEnrutamientoGPS
 
         public bool BuscarRutaBFS(GrafoMapa mapa, Nodo inicio, Nodo meta)
         {
-            // Reiniciar el estado de todos los nodos antes de cada búsqueda.
-            for (int i = 0; i < mapa.Filas; i++)
+            if (mapa == null || inicio == null || meta == null)
             {
-                for (int j = 0; j < mapa.Columnas; j++)
-                {
-                    mapa.MatrizNodos[i, j].Visitado = false;
-                }
+                throw new ArgumentNullException("El mapa, el nodo de inicio y la meta no pueden ser nulos.");
             }
-
-            // Preparar las estructuras de la búsqueda BFS.
-            Queue<Nodo> colaFrontera = new Queue<Nodo>();
-            Dictionary<Nodo, Nodo?> tablaPadres =
-                new Dictionary<Nodo, Nodo?>();
 
             RutaEncontrada = new List<Nodo>();
 
@@ -32,8 +22,15 @@ namespace SimuladorEnrutamientoGPS
                 return false;
             }
 
+            // ESTRUCTURAS APLICADAS SEGÚN DISEÑO TEÓRICO:
+            // 1. Cola (FIFO) para exploración por niveles (ruta más corta).
+            // 2. Tablas Hash (HashSet y Dictionary) para consultas O(1) de visitados y trazabilidad.
+            Queue<Nodo> colaFrontera = new Queue<Nodo>();
+            HashSet<Nodo> visitados = new HashSet<Nodo>();
+            Dictionary<Nodo, Nodo?> tablaPadres = new Dictionary<Nodo, Nodo?>();
+
             colaFrontera.Enqueue(inicio);
-            inicio.Visitado = true;
+            visitados.Add(inicio);
             tablaPadres[inicio] = null;
 
             while (colaFrontera.Count > 0)
@@ -51,9 +48,9 @@ namespace SimuladorEnrutamientoGPS
 
                 foreach (Nodo vecino in vecinos)
                 {
-                    if (!vecino.EsPared && !vecino.Visitado)
+                    if (!vecino.EsPared && !visitados.Contains(vecino))
                     {
-                        vecino.Visitado = true;
+                        visitados.Add(vecino);
                         tablaPadres[vecino] = actual;
                         colaFrontera.Enqueue(vecino);
                     }
@@ -65,35 +62,29 @@ namespace SimuladorEnrutamientoGPS
             return false;
         }
 
-        private List<Nodo> ObtenerVecinosAccesibles(
-            GrafoMapa mapa,
-            Nodo nodo)
+        private List<Nodo> ObtenerVecinosAccesibles(GrafoMapa mapa, Nodo nodo)
         {
             List<Nodo> vecinos = new List<Nodo>();
 
             int x = nodo.X;
             int y = nodo.Y;
 
-            if (x - 1 >= 0 &&
-                !mapa.MatrizNodos[x - 1, y].EsPared)
+            if (x - 1 >= 0 && !mapa.MatrizNodos[x - 1, y].EsPared)
             {
                 vecinos.Add(mapa.MatrizNodos[x - 1, y]);
             }
 
-            if (x + 1 < mapa.Filas &&
-                !mapa.MatrizNodos[x + 1, y].EsPared)
+            if (x + 1 < mapa.Filas && !mapa.MatrizNodos[x + 1, y].EsPared)
             {
                 vecinos.Add(mapa.MatrizNodos[x + 1, y]);
             }
 
-            if (y - 1 >= 0 &&
-                !mapa.MatrizNodos[x, y - 1].EsPared)
+            if (y - 1 >= 0 && !mapa.MatrizNodos[x, y - 1].EsPared)
             {
                 vecinos.Add(mapa.MatrizNodos[x, y - 1]);
             }
 
-            if (y + 1 < mapa.Columnas &&
-                !mapa.MatrizNodos[x, y + 1].EsPared)
+            if (y + 1 < mapa.Columnas && !mapa.MatrizNodos[x, y + 1].EsPared)
             {
                 vecinos.Add(mapa.MatrizNodos[x, y + 1]);
             }
@@ -101,9 +92,7 @@ namespace SimuladorEnrutamientoGPS
             return vecinos;
         }
 
-        private List<Nodo> ReconstruirCamino(
-            Dictionary<Nodo, Nodo?> padres,
-            Nodo meta)
+        private List<Nodo> ReconstruirCamino(Dictionary<Nodo, Nodo?> padres, Nodo meta)
         {
             List<Nodo> camino = new List<Nodo>();
             Nodo? actual = meta;

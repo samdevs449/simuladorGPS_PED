@@ -10,13 +10,24 @@ namespace SimuladorEnrutamientoGPS
         public Nodo[,] MatrizNodos { get; private set; }
         public int Filas { get; private set; }
         public int Columnas { get; private set; }
-        private Random aleatorio = new Random(); // Para elegir caminos al azar
+        private Random aleatorio; // Para elegir caminos al azar (o reproducibles mediante semilla)
 
-        // Constructor: Crea la cuadrícula llena de paredes
-        public GrafoMapa(int filas, int columnas)
+        // Constructor: Valida dimensiones y crea la cuadrícula llena de paredes
+        public GrafoMapa(int filas, int columnas, int? semilla = null)
         {
+            if (filas < 5 || columnas < 5)
+            {
+                throw new ArgumentException("Las dimensiones del mapa deben ser de al menos 5x5.");
+            }
+
+            if (filas % 2 == 0 || columnas % 2 == 0)
+            {
+                throw new ArgumentException("Las dimensiones del mapa deben ser números impares para generar paredes intermedias.");
+            }
+
             Filas = filas;
             Columnas = columnas;
+            aleatorio = semilla.HasValue ? new Random(semilla.Value) : new Random();
             MatrizNodos = new Nodo[filas, columnas];
 
             for (int i = 0; i < filas; i++)
@@ -27,6 +38,7 @@ namespace SimuladorEnrutamientoGPS
                 }
             }
         }
+        
 
         //  MÉTODO PRINCIPAL: GENERADOR DE LABERINTO (DFS) ---
         public void GenerarLaberintoDFS()
